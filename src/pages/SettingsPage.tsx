@@ -280,7 +280,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {accounts.map((acc) => (
-                  <div key={acc.id} className="flex items-center justify-between rounded-lg border border-border/50 p-4 hover:bg-secondary/20 transition-colors">
+                  <div key={acc.id} className="flex items-center justify-between rounded-lg border border-border/50 p-4 hover:bg-secondary/20 hover:border-primary/20 transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{acc.icon}</span>
                       <div>
