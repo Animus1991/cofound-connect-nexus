@@ -114,7 +114,7 @@ export default function NetworkPage() {
             { label: "Sent", value: outgoingRequests.length, icon: UserPlus },
             { label: "Suggested", value: mockSuggested.length, icon: Sparkles },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4 flex items-center gap-3">
+            <div key={stat.label} className="rounded-xl border border-border/50 bg-card-gradient p-4 flex items-center gap-3 hover-lift">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <stat.icon className="h-5 w-5 text-primary" />
               </div>
@@ -162,7 +162,7 @@ export default function NetworkPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    className="rounded-xl border border-border/50 bg-card p-4"
+                    className="rounded-xl border border-border/50 bg-card-gradient p-4 interactive-card"
                   >
                     <div className="flex items-start gap-3">
                       <div className="relative">
@@ -214,7 +214,7 @@ export default function NetworkPage() {
                     layout
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl border border-border/50 bg-card p-4"
+                    className="rounded-xl border border-border/50 bg-card-gradient p-4 interactive-card"
                   >
                     <div className="flex items-start gap-3">
                       <Avatar className="h-10 w-10">
@@ -251,7 +251,7 @@ export default function NetworkPage() {
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-foreground">Sent Requests</h3>
                 {outgoingRequests.map((req) => (
-                  <div key={req.id} className="rounded-xl border border-border/50 bg-card p-4 flex items-center gap-3">
+                  <div key={req.id} className="rounded-xl border border-border/50 bg-card-gradient p-4 flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-primary/20 text-primary font-semibold text-xs">
                         {req.initials}
@@ -285,7 +285,7 @@ export default function NetworkPage() {
                   key={s.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-border/50 bg-card p-4"
+                  className="rounded-xl border border-border/50 bg-card-gradient p-4 interactive-card"
                 >
                   <div className="flex items-start gap-3">
                     <Avatar className="h-12 w-12">

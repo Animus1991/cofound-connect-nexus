@@ -142,7 +142,7 @@ export default function LearningPage() {
             { icon: Clock, label: "Learning Hours", value: "12.5h", color: "text-primary" },
             { icon: Users, label: "Mentor Sessions", value: "3", color: "text-primary" },
           ].map((stat) => (
-            <Card key={stat.label} className="border-border/50">
+            <Card key={stat.label} className="border-border/50 hover-lift bg-card-gradient">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
@@ -220,7 +220,7 @@ export default function LearningPage() {
                 const isComplete = course.completedLessons === course.lessons;
                 return (
                   <motion.div key={course.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                    <Card className="border-border/50 hover:border-primary/30 transition-colors h-full flex flex-col">
+                    <Card className="border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-glow h-full flex flex-col">
                       <CardContent className="p-5 flex-1 flex flex-col">
                         <div className="flex items-start justify-between">
                           <div className="text-3xl">{course.thumbnail}</div>
@@ -267,7 +267,7 @@ export default function LearningPage() {
                 const TypeIcon = resourceTypeIcons[res.type] || FileText;
                 return (
                   <motion.div key={res.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                    <Card className="border-border/50 hover:border-primary/30 transition-colors h-full">
+                    <Card className="border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-glow h-full">
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between">
                           <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -305,7 +305,7 @@ export default function LearningPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredMentors.map((mentor) => (
                 <motion.div key={mentor.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="border-border/50 hover:border-primary/30 transition-colors">
+                  <Card className="border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-glow">
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-14 w-14 shrink-0">

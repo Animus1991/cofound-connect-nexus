@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 import { StatSkeleton, CardSkeleton, ListItemSkeleton } from "@/components/SkeletonLoaders";
+import { useNotifications } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -65,6 +66,8 @@ export default function DashboardPage() {
   const [savedMatches, setSavedMatches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const completedTodos = todoItems.filter((t) => t.done).length;
+
+  useNotifications();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1200);

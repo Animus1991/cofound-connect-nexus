@@ -367,14 +367,14 @@ export default function ProfilePage() {
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {verificationItems.map((item) => (
-              <div
-                key={item.label}
-                className={`flex items-center gap-3 rounded-xl border p-4 ${
-                  item.verified
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-border/30 bg-secondary/20"
-                }`}
-              >
+                <div
+                  key={item.label}
+                  className={`flex items-center gap-3 rounded-xl border p-4 transition-all duration-200 hover:scale-[1.01] ${
+                    item.verified
+                      ? "border-primary/30 bg-primary/5"
+                      : "border-border/30 bg-secondary/20"
+                  }`}
+                >
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                     item.verified ? "bg-primary/20" : "bg-secondary"
