@@ -14,15 +14,18 @@ import {
   Bell,
   Settings,
   LogOut,
+  Target,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
   { icon: Home, label: "Dashboard", path: "/dashboard" },
   { icon: Search, label: "Discover", path: "/discover" },
   { icon: MessageSquare, label: "Messages", path: "/messages", badge: 3 },
+  { icon: GraduationCap, label: "Mentors", path: "/mentors" },
+  { icon: Users, label: "Communities", path: "/communities" },
   { icon: Briefcase, label: "Opportunities", path: "/opportunities" },
-  { icon: Users, label: "My Network", path: "/network" },
-  { icon: GraduationCap, label: "Learning", path: "/learning" },
+  { icon: Target, label: "Milestones", path: "/milestones" },
 ];
 
 interface AppLayoutProps {
