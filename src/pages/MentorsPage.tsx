@@ -14,7 +14,6 @@ import {
 import {
   Search,
   Star,
-  Clock,
   Users,
   MapPin,
   Calendar,
@@ -101,38 +100,38 @@ export default function MentorsPage() {
         <div className="hidden sm:flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search mentors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 w-56 h-9 bg-secondary/50" />
+            <Input placeholder="Search mentors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 w-56 h-9 bg-secondary/30 border-border/40" />
           </div>
         </div>
       }
     >
-      <div className="p-4 sm:p-6 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
         {/* Mobile search */}
         <div className="sm:hidden">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search mentors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 bg-secondary/50" />
+            <Input placeholder="Search mentors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 bg-secondary/30" />
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           <Select value={expertiseFilter} onValueChange={setExpertiseFilter}>
-            <SelectTrigger className="w-40 h-9 bg-secondary/50"><Filter className="h-3 w-3 mr-1" /><SelectValue placeholder="Expertise" /></SelectTrigger>
+            <SelectTrigger className="w-40 h-9 bg-secondary/30 border-border/40"><Filter className="h-3 w-3 mr-1" /><SelectValue placeholder="Expertise" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Expertise</SelectItem>
               {expertiseOptions.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={stageFilter} onValueChange={setStageFilter}>
-            <SelectTrigger className="w-40 h-9 bg-secondary/50"><SelectValue placeholder="Stage" /></SelectTrigger>
+            <SelectTrigger className="w-40 h-9 bg-secondary/30 border-border/40"><SelectValue placeholder="Stage" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Stages</SelectItem>
               {stageOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
-            <SelectTrigger className="w-40 h-9 bg-secondary/50"><SelectValue placeholder="Availability" /></SelectTrigger>
+            <SelectTrigger className="w-40 h-9 bg-secondary/30 border-border/40"><SelectValue placeholder="Availability" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Any Availability</SelectItem>
               <SelectItem value="open">Open</SelectItem>
@@ -152,20 +151,23 @@ export default function MentorsPage() {
               {filtered.map((mentor, i) => (
                 <motion.div
                   key={mentor.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="rounded-2xl border border-border/50 bg-card-gradient p-5 interactive-card"
+                  initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="rounded-2xl border border-border/40 bg-card p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-[0_2px_16px_hsl(var(--primary)/0.06)] active:scale-[0.99]"
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/20">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/12">
                       <GraduationCap className="h-5 w-5 text-primary" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h3 className="font-display text-sm font-semibold text-foreground truncate">{mentor.name}</h3>
-                      <p className="text-xs text-muted-foreground truncate">{mentor.headline}</p>
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{mentor.headline}</p>
                     </div>
-                    <Badge variant={mentor.availability === "Open" ? "default" : "secondary"} className="ml-auto shrink-0 text-[10px]">
+                    <Badge
+                      variant={mentor.availability === "Open" ? "default" : "secondary"}
+                      className="shrink-0 text-[10px]"
+                    >
                       {mentor.availability}
                     </Badge>
                   </div>
@@ -174,12 +176,12 @@ export default function MentorsPage() {
 
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {mentor.expertise.map(e => (
-                      <span key={e} className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">{e}</span>
+                      <span key={e} className="rounded-full bg-primary/8 px-2 py-0.5 text-[10px] font-medium text-primary">{e}</span>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 mb-4 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><Star className="h-3 w-3 text-accent" />{mentor.rating} rating</span>
+                    <span className="flex items-center gap-1"><Star className="h-3 w-3 text-accent fill-accent" />{mentor.rating}</span>
                     <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{mentor.sessions} sessions</span>
                     <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{mentor.location.split(",")[0]}</span>
                     <span className="flex items-center gap-1"><Users className="h-3 w-3" />{mentor.currentMentees}/{mentor.maxMentees} mentees</span>
@@ -187,7 +189,7 @@ export default function MentorsPage() {
 
                   <div className="flex flex-wrap gap-1 mb-4">
                     {mentor.stages.map(s => (
-                      <span key={s} className="rounded bg-secondary px-1.5 py-0.5 text-[10px] text-secondary-foreground">{s}</span>
+                      <span key={s} className="rounded-md bg-secondary/50 px-1.5 py-0.5 text-[10px] text-secondary-foreground">{s}</span>
                     ))}
                   </div>
 
@@ -215,7 +217,7 @@ export default function MentorsPage() {
 
         {!isLoading && filtered.length === 0 && (
           <div className="text-center py-16">
-            <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+            <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/20 mb-4" />
             <h3 className="font-display text-lg font-semibold text-foreground mb-2">No mentors found</h3>
             <p className="text-sm text-muted-foreground mb-4">Try adjusting your filters</p>
             <Button variant="outline" size="sm" onClick={() => { setExpertiseFilter("all"); setStageFilter("all"); setAvailabilityFilter("all"); setSearchQuery(""); }}>
