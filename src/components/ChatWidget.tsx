@@ -80,8 +80,6 @@ export default function ChatWidget() {
     if (view === "thread") inputRef.current?.focus();
   }, [view]);
 
-  if (isHidden) return null;
-
   const openAgentChat = useCallback((agent: AIAgent) => {
     setActiveAgent(agent);
     setActiveConvoId(null);
@@ -95,6 +93,8 @@ export default function ChatWidget() {
     setActiveAgent(null);
     setView("thread");
   }, []);
+
+  if (isHidden) return null;
 
   const handleSend = async () => {
     if (!input.trim()) return;
