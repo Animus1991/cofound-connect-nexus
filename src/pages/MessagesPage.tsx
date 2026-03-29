@@ -258,7 +258,7 @@ export default function MessagesPage() {
                       layout
                       initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                       className="rounded-xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-primary/15"
                     >
                       <div className="flex items-start gap-3">

@@ -153,7 +153,7 @@ export default function MentorsPage() {
                   key={mentor.id}
                   initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                   className="rounded-2xl border border-border/40 bg-card p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-[0_2px_16px_hsl(var(--primary)/0.06)] active:scale-[0.99]"
                 >
                   <div className="flex items-start gap-3 mb-4">
