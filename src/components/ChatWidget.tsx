@@ -153,7 +153,7 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1, height: isMinimized ? "auto" : undefined }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="fixed bottom-[5.5rem] right-4 lg:bottom-6 lg:right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-background shadow-elevated overflow-hidden flex flex-col"
             style={{ maxHeight: isMinimized ? undefined : "min(520px, calc(100vh - 120px))" }}
           >

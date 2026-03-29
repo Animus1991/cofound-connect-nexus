@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
                   key={stat.label}
                   initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                   className="group rounded-xl border border-border/50 bg-card p-4 sm:p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-[0_2px_16px_hsl(var(--primary)/0.08)] active:scale-[0.98]"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -222,7 +222,7 @@ export default function AdminDashboardPage() {
               <motion.div
                 initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ ...stagger(4), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ ...stagger(4), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="lg:col-span-2 rounded-2xl border border-border/50 bg-card p-6"
               >
                 <h3 className="font-display text-base font-semibold text-foreground mb-1">User Growth</h3>
@@ -252,7 +252,7 @@ export default function AdminDashboardPage() {
               <motion.div
                 initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ ...stagger(5), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ ...stagger(5), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="rounded-2xl border border-border/50 bg-card p-6"
               >
                 <h3 className="font-display text-base font-semibold text-foreground mb-1">Role Distribution</h3>
@@ -287,7 +287,7 @@ export default function AdminDashboardPage() {
               <motion.div
                 initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ ...stagger(6), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ ...stagger(6), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="rounded-2xl border border-border/50 bg-card p-6"
               >
                 <h3 className="font-display text-base font-semibold text-foreground mb-1">Match Rates</h3>
@@ -308,7 +308,7 @@ export default function AdminDashboardPage() {
               <motion.div
                 initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ ...stagger(7), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ ...stagger(7), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="rounded-2xl border border-border/50 bg-card p-6"
               >
                 <h3 className="font-display text-base font-semibold text-foreground mb-1">Community Engagement</h3>
@@ -331,7 +331,7 @@ export default function AdminDashboardPage() {
             <motion.div
               initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ ...stagger(8), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ ...stagger(8), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
               className="rounded-2xl border border-border/50 bg-card p-6"
             >
               <h3 className="font-display text-base font-semibold text-foreground mb-1">Platform Health Metrics</h3>
@@ -439,7 +439,7 @@ export default function AdminDashboardPage() {
                 key={item.id}
                 initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="rounded-xl border border-border/50 bg-card p-5 transition-all duration-200 hover:border-primary/15"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -486,7 +486,7 @@ export default function AdminDashboardPage() {
                   key={tax.name}
                   initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ ...stagger(i), duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                   className="rounded-xl border border-border/50 bg-card p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-[0_2px_16px_hsl(var(--primary)/0.08)] active:scale-[0.99]"
                 >
                   <div className="flex items-center justify-between mb-2">
