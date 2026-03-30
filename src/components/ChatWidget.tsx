@@ -16,41 +16,31 @@ import {
   Maximize2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  AI_AGENTS,
-  getAIResponse,
-  type AIAgent,
-  type ChatMessage,
-} from "@/services/aiService";
-
-interface UserConversation {
-  id: string;
-  name: string;
-  initials: string;
-  lastMessage: string;
-  time: string;
-  unread: number;
-  online: boolean;
-}
+import { AI_AGENTS, type AIAgent } from "@/services/aiService";
+import { useMessaging } from "@/stores/useMessaging";
+import ReactMarkdown from "react-markdown";
 
 type ChatView = "list" | "thread";
-
-const mockUserConversations: UserConversation[] = [
-  { id: "u1", name: "Alex Chen", initials: "AC", lastMessage: "Let's schedule a call!", time: "10m", unread: 2, online: true },
-  { id: "u2", name: "Maria Santos", initials: "MS", lastMessage: "Deck looks great 🚀", time: "1h", unread: 0, online: true },
-  { id: "u3", name: "Dimitris P.", initials: "DP", lastMessage: "MVP is ready for testing", time: "3h", unread: 0, online: false },
-];
 
 export default function ChatWidget() {
   const location = useLocation();
   const navigate = useNavigate();
+  const {
+    conversations,
+    aiConversations,
+    totalUnread,
+    getMessages,
+    sendMessage,
+    sendAIMessage,
+    markAsRead,
+  } = useMessaging();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [view, setView] = useState<ChatView>("list");
   const [activeTab, setActiveTab] = useState<"chats" | "agents">("chats");
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
   const [activeAgent, setActiveAgent] = useState<AIAgent | null>(null);
-  const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -59,11 +49,8 @@ export default function ChatWidget() {
   const hiddenPaths = ["/", "/login", "/signup", "/onboarding"];
   const isHidden = hiddenPaths.includes(location.pathname);
 
-  const totalUnread = mockUserConversations.reduce((sum, c) => sum + c.unread, 0);
-
-  const currentMessages = activeAgent
-    ? messages[`agent-${activeAgent.id}`] || []
-    : messages[`user-${activeConvoId}`] || [];
+  const currentConvoId = activeAgent ? `agent-${activeAgent.id}` : activeConvoId;
+  const currentMessages = currentConvoId ? getMessages(currentConvoId) : [];
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,11 +68,15 @@ export default function ChatWidget() {
     setIsMinimized(false);
   }, []);
 
-  const openUserChat = useCallback((convo: UserConversation) => {
-    setActiveConvoId(convo.id);
-    setActiveAgent(null);
-    setView("thread");
-  }, []);
+  const openUserChat = useCallback(
+    (convoId: string) => {
+      setActiveConvoId(convoId);
+      setActiveAgent(null);
+      setView("thread");
+      markAsRead(convoId);
+    },
+    [markAsRead]
+  );
 
   if (isHidden) return null;
 
@@ -94,37 +85,21 @@ export default function ChatWidget() {
     const text = input.trim();
     setInput("");
 
-    const userMsg: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    };
-
-    const key = activeAgent ? `agent-${activeAgent.id}` : `user-${activeConvoId}`;
-    setMessages((prev) => ({ ...prev, [key]: [...(prev[key] || []), userMsg] }));
-
     if (activeAgent) {
       setIsTyping(true);
       try {
-        const response = await getAIResponse(activeAgent.id, text);
-        const aiMsg: ChatMessage = {
-          id: `msg-${Date.now()}-ai`,
-          role: "assistant",
-          content: response,
-          timestamp: new Date(),
-          agentId: activeAgent.id,
-        };
-        setMessages((prev) => ({ ...prev, [key]: [...(prev[key] || []), aiMsg] }));
+        await sendAIMessage(activeAgent.id, text);
       } finally {
         setIsTyping(false);
       }
+    } else if (activeConvoId) {
+      sendMessage(activeConvoId, text);
     }
   };
 
   return (
     <>
-      {/* FAB — positioned above mobile bottom nav */}
+      {/* FAB */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -133,7 +108,10 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => { setIsOpen(true); setIsMinimized(false); }}
+            onClick={() => {
+              setIsOpen(true);
+              setIsMinimized(false);
+            }}
             className="fixed bottom-[5.5rem] right-4 lg:bottom-6 lg:right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elevated"
           >
             <MessageSquare className="h-5 w-5" />
@@ -151,18 +129,34 @@ export default function ChatWidget() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1, height: isMinimized ? "auto" : undefined }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              height: isMinimized ? "auto" : undefined,
+            }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+            transition={{
+              duration: 0.2,
+              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+            }}
             className="fixed bottom-[5.5rem] right-4 lg:bottom-6 lg:right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-background shadow-elevated overflow-hidden flex flex-col"
-            style={{ maxHeight: isMinimized ? undefined : "min(520px, calc(100vh - 120px))" }}
+            style={{
+              maxHeight: isMinimized
+                ? undefined
+                : "min(520px, calc(100vh - 120px))",
+            }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border bg-card shrink-0">
               <div className="flex items-center gap-2">
                 {view === "thread" && (
                   <button
-                    onClick={() => { setView("list"); setActiveAgent(null); setActiveConvoId(null); }}
+                    onClick={() => {
+                      setView("list");
+                      setActiveAgent(null);
+                      setActiveConvoId(null);
+                    }}
                     className="p-1 rounded-md hover:bg-secondary transition-colors"
                   >
                     <ChevronLeft className="h-4 w-4 text-muted-foreground" />
@@ -172,9 +166,12 @@ export default function ChatWidget() {
                   <div className="flex items-center gap-2">
                     <span className="text-base">{activeAgent.avatar}</span>
                     <div>
-                      <p className="text-sm font-medium text-foreground leading-none">{activeAgent.name}</p>
+                      <p className="text-sm font-medium text-foreground leading-none">
+                        {activeAgent.name}
+                      </p>
                       <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                        <Sparkles className="h-2.5 w-2.5 text-primary" /> AI Agent
+                        <Sparkles className="h-2.5 w-2.5 text-primary" /> AI
+                        Agent
                       </p>
                     </div>
                   </div>
@@ -182,15 +179,23 @@ export default function ChatWidget() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarFallback className="bg-primary/10 text-primary text-[9px] font-medium">
-                        {mockUserConversations.find((c) => c.id === activeConvoId)?.initials}
+                        {
+                          conversations.find((c) => c.id === activeConvoId)
+                            ?.initials
+                        }
                       </AvatarFallback>
                     </Avatar>
                     <p className="text-sm font-medium text-foreground">
-                      {mockUserConversations.find((c) => c.id === activeConvoId)?.name}
+                      {
+                        conversations.find((c) => c.id === activeConvoId)
+                          ?.name
+                      }
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm font-medium text-foreground">Messages</p>
+                  <p className="text-sm font-medium text-foreground">
+                    Messages
+                  </p>
                 )}
               </div>
               <div className="flex items-center gap-0.5">
@@ -203,10 +208,19 @@ export default function ChatWidget() {
                     <Maximize2 className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
                 )}
-                <button onClick={() => setIsMinimized(!isMinimized)} className="p-1.5 rounded-md hover:bg-secondary transition-colors">
+                <button
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+                >
                   <Minus className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
-                <button onClick={() => { setIsOpen(false); setView("list"); }} className="p-1.5 rounded-md hover:bg-secondary transition-colors">
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setView("list");
+                  }}
+                  className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+                >
                   <X className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
               </div>
@@ -221,7 +235,9 @@ export default function ChatWidget() {
                       <button
                         onClick={() => setActiveTab("chats")}
                         className={`flex-1 py-2 text-xs font-medium transition-colors border-b-2 ${
-                          activeTab === "chats" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                          activeTab === "chats"
+                            ? "border-primary text-primary"
+                            : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Chats
@@ -234,7 +250,9 @@ export default function ChatWidget() {
                       <button
                         onClick={() => setActiveTab("agents")}
                         className={`flex-1 py-2 text-xs font-medium transition-colors border-b-2 flex items-center justify-center gap-1 ${
-                          activeTab === "agents" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                          activeTab === "agents"
+                            ? "border-primary text-primary"
+                            : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         <Sparkles className="h-3 w-3" /> AI Agents
@@ -244,10 +262,10 @@ export default function ChatWidget() {
                     <ScrollArea className="flex-1">
                       {activeTab === "chats" ? (
                         <div className="p-1.5 space-y-0.5">
-                          {mockUserConversations.map((convo) => (
+                          {conversations.map((convo) => (
                             <button
                               key={convo.id}
-                              onClick={() => openUserChat(convo)}
+                              onClick={() => openUserChat(convo.id)}
                               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-secondary"
                             >
                               <div className="relative">
@@ -256,14 +274,22 @@ export default function ChatWidget() {
                                     {convo.initials}
                                   </AvatarFallback>
                                 </Avatar>
-                                {convo.online && <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-[1.5px] border-background bg-primary" />}
+                                {convo.online && (
+                                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-[1.5px] border-background bg-primary" />
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-sm font-medium text-foreground truncate">{convo.name}</span>
-                                  <span className="text-[10px] text-muted-foreground ml-2">{convo.time}</span>
+                                  <span className="text-sm font-medium text-foreground truncate">
+                                    {convo.name}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground ml-2">
+                                    {convo.time}
+                                  </span>
                                 </div>
-                                <p className="text-xs text-muted-foreground truncate">{convo.lastMessage}</p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {convo.lastMessage}
+                                </p>
                               </div>
                               {convo.unread > 0 && (
                                 <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
@@ -281,13 +307,24 @@ export default function ChatWidget() {
                               onClick={() => openAgentChat(agent)}
                               className="flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2.5 text-left transition-colors hover:bg-secondary"
                             >
-                              <span className="text-xl shrink-0">{agent.avatar}</span>
+                              <span className="text-xl shrink-0">
+                                {agent.avatar}
+                              </span>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-medium text-foreground">{agent.name}</span>
-                                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">AI</Badge>
+                                  <span className="text-sm font-medium text-foreground">
+                                    {agent.name}
+                                  </span>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-[9px] px-1.5 py-0 h-4"
+                                  >
+                                    AI
+                                  </Badge>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{agent.description}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                  {agent.description}
+                                </p>
                               </div>
                             </button>
                           ))}
@@ -304,8 +341,12 @@ export default function ChatWidget() {
                       <div className="space-y-2.5">
                         {currentMessages.length === 0 && activeAgent && (
                           <div className="text-center py-6">
-                            <span className="text-3xl block mb-2">{activeAgent.avatar}</span>
-                            <p className="text-sm font-medium text-foreground">{activeAgent.name}</p>
+                            <span className="text-3xl block mb-2">
+                              {activeAgent.avatar}
+                            </span>
+                            <p className="text-sm font-medium text-foreground">
+                              {activeAgent.name}
+                            </p>
                             <p className="text-xs text-muted-foreground mt-1 mb-4 max-w-[220px] mx-auto">
                               {activeAgent.description}
                             </p>
@@ -326,25 +367,51 @@ export default function ChatWidget() {
                         {currentMessages.length === 0 && !activeAgent && (
                           <div className="text-center py-8">
                             <User className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
-                            <p className="text-sm text-muted-foreground">Start a conversation</p>
+                            <p className="text-sm text-muted-foreground">
+                              Start a conversation
+                            </p>
                           </div>
                         )}
 
                         {currentMessages.map((msg) => (
-                          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                            <div className={`flex items-end gap-1.5 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-                              {msg.role === "assistant" && (
-                                <span className="text-sm shrink-0 mb-0.5">{activeAgent?.avatar || "🤖"}</span>
+                          <div
+                            key={msg.id}
+                            className={`flex ${
+                              msg.role === "user" && activeAgent
+                                ? "justify-end"
+                                : msg.role === "assistant" && !activeAgent
+                                  ? "justify-end"
+                                  : "justify-start"
+                            }`}
+                          >
+                            <div
+                              className={`flex items-end gap-1.5 max-w-[85%] ${
+                                (msg.role === "user" && activeAgent) ||
+                                (msg.role === "assistant" && !activeAgent)
+                                  ? "flex-row-reverse"
+                                  : ""
+                              }`}
+                            >
+                              {msg.role === "assistant" && activeAgent && (
+                                <span className="text-sm shrink-0 mb-0.5">
+                                  {activeAgent.avatar}
+                                </span>
                               )}
-                              <div className={`rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                                msg.role === "user"
-                                  ? "bg-primary text-primary-foreground rounded-br-sm"
-                                  : "bg-secondary text-secondary-foreground rounded-bl-sm"
-                              }`}>
-                                {msg.content.split("\n").map((line, i) => {
-                                  const boldLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                                  return <p key={i} className={line.trim() === "" ? "h-1.5" : ""} dangerouslySetInnerHTML={{ __html: boldLine }} />;
-                                })}
+                              <div
+                                className={`rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                                  (msg.role === "user" && activeAgent) ||
+                                  (msg.role === "assistant" && !activeAgent)
+                                    ? "bg-primary text-primary-foreground rounded-br-sm"
+                                    : "bg-secondary text-secondary-foreground rounded-bl-sm"
+                                }`}
+                              >
+                                {activeAgent && msg.role === "assistant" ? (
+                                  <div className="prose prose-sm dark:prose-invert max-w-none [&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:my-1 [&_li]:my-0.5">
+                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                  </div>
+                                ) : (
+                                  <p>{msg.content}</p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -352,11 +419,17 @@ export default function ChatWidget() {
 
                         {isTyping && (
                           <div className="flex items-end gap-1.5">
-                            <span className="text-sm">{activeAgent?.avatar || "🤖"}</span>
+                            <span className="text-sm">
+                              {activeAgent?.avatar || "🤖"}
+                            </span>
                             <div className="bg-secondary rounded-2xl rounded-bl-sm px-3.5 py-2.5">
                               <div className="flex gap-1">
                                 {[0, 150, 300].map((d) => (
-                                  <span key={d} className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                                  <span
+                                    key={d}
+                                    className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40 animate-bounce"
+                                    style={{ animationDelay: `${d}ms` }}
+                                  />
                                 ))}
                               </div>
                             </div>
@@ -367,16 +440,31 @@ export default function ChatWidget() {
                     </ScrollArea>
 
                     <div className="border-t border-border px-3 py-2 shrink-0">
-                      <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex items-center gap-2">
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleSend();
+                        }}
+                        className="flex items-center gap-2"
+                      >
                         <Input
                           ref={inputRef}
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
-                          placeholder={activeAgent ? `Ask ${activeAgent.name}...` : "Type a message..."}
+                          placeholder={
+                            activeAgent
+                              ? `Ask ${activeAgent.name}...`
+                              : "Type a message..."
+                          }
                           className="flex-1 h-8 text-sm border-border"
                           disabled={isTyping}
                         />
-                        <Button type="submit" size="icon" className="h-8 w-8 shrink-0" disabled={!input.trim() || isTyping}>
+                        <Button
+                          type="submit"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          disabled={!input.trim() || isTyping}
+                        >
                           <Send className="h-3.5 w-3.5" />
                         </Button>
                       </form>
