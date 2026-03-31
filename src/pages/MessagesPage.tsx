@@ -100,6 +100,13 @@ export default function MessagesPage() {
     }
   };
 
+  // Show typing dots only during the brief initial pause before first token arrives
+  const isStreamingEmpty =
+    currentConvo?.type === "ai" &&
+    currentMessages.length > 0 &&
+    currentMessages[currentMessages.length - 1]?.role === "assistant" &&
+    currentMessages[currentMessages.length - 1]?.content === "";
+
   const isOwnMessage = (msg: UnifiedMessage, convo: Conversation | undefined) => {
     if (!convo) return false;
     if (convo.type === "ai") return msg.role === "user";

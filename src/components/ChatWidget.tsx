@@ -97,6 +97,13 @@ export default function ChatWidget() {
     }
   };
 
+  // Show typing dots only during the brief initial thinking pause (before first token)
+  const isStreamingActive = activeAgent
+    ? currentMessages.length > 0 &&
+      currentMessages[currentMessages.length - 1]?.role === "assistant" &&
+      currentMessages[currentMessages.length - 1]?.content === ""
+    : false;
+
   return (
     <>
       {/* FAB */}
