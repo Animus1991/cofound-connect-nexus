@@ -426,7 +426,7 @@ export default function ChatWidget() {
                           </div>
                         ))}
 
-                        {isTyping && (
+                        {(isTyping || isStreamingActive) && (
                           <div className="flex items-end gap-1.5">
                             <span className="text-sm">
                               {activeAgent?.avatar || "🤖"}

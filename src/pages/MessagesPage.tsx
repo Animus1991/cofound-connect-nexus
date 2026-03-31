@@ -496,7 +496,7 @@ export default function MessagesPage() {
                   })}
 
                   {/* AI typing indicator */}
-                  {isTyping && (
+                  {(isTyping || isStreamingEmpty) && (
                     <div className="flex items-end gap-1.5">
                       <span className="text-sm">{currentConvo.agentAvatar || "🤖"}</span>
                       <div className="bg-secondary rounded-2xl rounded-bl-sm px-3.5 py-2.5">
