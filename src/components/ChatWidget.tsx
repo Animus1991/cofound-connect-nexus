@@ -52,9 +52,11 @@ export default function ChatWidget() {
   const currentConvoId = activeAgent ? `agent-${activeAgent.id}` : activeConvoId;
   const currentMessages = currentConvoId ? getMessages(currentConvoId) : [];
 
+  // Auto-scroll on new messages AND on streaming content changes
+  const lastMsgContent = currentMessages[currentMessages.length - 1]?.content;
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentMessages.length, isTyping]);
+  }, [currentMessages.length, isTyping, lastMsgContent]);
 
   useEffect(() => {
     if (view === "thread") inputRef.current?.focus();
